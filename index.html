@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>EZWork Assignment Contact Form</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      font-family: "Poppins", sans-serif;
+    }
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f5f7fa;
+      color: #333;
+    }
+    header {
+      background: #4a90e2;
+      color: white;
+      padding: 15px 0;
+      text-align: center;
+      font-size: 24px;
+      font-weight: bold;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #333;
+    }
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    input, textarea {
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      width: 100%;
+    }
+    input:focus, textarea:focus {
+      border-color: #4a90e2;
+      outline: none;
+    }
+    button {
+      background: #4a90e2;
+      color: white;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    button:hover {
+      background: #357abd;
+    }
+    .message {
+      text-align: center;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    @media (max-width: 600px) {
+      .container {
+        margin: 20px;
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>EZ Work Assignment Contact Us</header>
+  <div class="container">
+    <h2>Get in Touch</h2>
+    <form id="contactForm">
+      <input type="text" id="name" placeholder="Your Name" required />
+      <input type="email" id="email" placeholder="Your Email" required />
+      <input type="text" id="phone" placeholder="Phone Number" required />
+      <textarea id="message" rows="4" placeholder="Your Message" required></textarea>
+      <button type="submit">Submit</button>
+    </form>
+    <div class="message" id="responseMessage"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById("contactForm");
+    const responseMsg = document.getElementById("responseMessage");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+      const message = document.getElementById("message").value.trim();
+
+      // Front-end Validation
+      if (!name || !email || !phone || !message) {
+        responseMsg.style.color = "red";
+        responseMsg.textContent = "All fields are required!";
+        return;
+      }
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+        responseMsg.style.color = "red";
+        responseMsg.textContent = "Please enter a valid email address!";
+        return;
+      }
+
+      // API call
+      try {
+        const res = await fetch("https://vernanbackend.ezlab.in/api/contact-us/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ name, email, phone, message }),
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          console.log("Success:", data);
+          responseMsg.style.color = "green";
+          responseMsg.textContent = "Form Submitted ";
+          form.reset();
+        } else {
+          responseMsg.style.color = "red";
+          responseMsg.textContent = "Failed to submit form (API issue)";
+        }
+      } catch (error) {
+        console.error(error);
+        responseMsg.style.color = "red";
+        responseMsg.textContent = "Network error. Please try again!";
+      }
+    });
+  </script>
+</body>
+</html>
